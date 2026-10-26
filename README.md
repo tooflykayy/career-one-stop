@@ -1,79 +1,123 @@
 # Career One Stop
 
-A cloud-based career platform to help students connect their skills with employment opportunities by identifying skill gaps, finding learning resources, and tracking job applications.
+**Live Website:** https://career-one-stop.onrender.com  
+**GitHub Repository:** https://github.com/tooflykayy/career-one-stop
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](#license)
-[![Python](https://img.shields.io/badge/python-3.10+-blue.svg)](#requirements)
-[![Docker](https://img.shields.io/badge/docker-ready-green.svg)](#docker)
+## Project Overview
 
-Table of contents
-- [About](#about)
-- [Target users](#target-users)
-- [Features](#features)
-- [Tech stack](#tech-stack)
-- [Getting started](#getting-started)
-- [Docker](#docker)
-- [Configuration](#configuration)
-- [Testing](#testing)
-- [Project structure](#project-structure)
-- [Contributing](#contributing)
-- [License](#license)
-- [Acknowledgements & Contact](#acknowledgements--contact)
+Career One Stop is a web application designed to help users organize their skills and take steps toward their career goals. The project provides a centralized place for users to record their skills and begin planning their professional development.
 
-About
------
-The purpose of Career One Stop is to develop a cloud-based career platform that helps students connect their skills with employment opportunities. Many students struggle to identify the skills employers require, find learning resources, organize their skill development, and keep track of job applications. Career One Stop brings these activities together in one centralized platform.
+The application is being developed as a collaborative software engineering project, with an emphasis on building a functional, accessible, and user-friendly web experience.
 
-The application allows users to:
-- Create a skill profile
-- Select a target job
-- Compare current skills with job requirements
-- Identify skill gaps
-- Find relevant learning resources
-- Create development plans
-- Track job applications
+## Current Features
 
-The goal is to help users make informed career decisions, improve their qualifications, and stay organized throughout their job search.
+- **Dashboard:** Provides an overview of the user's career-planning information, including saved skills.
+- **Skills Management:** Allows users to add and organize their skills.
+- **Skill Categories:** Supports organizing skills by category.
+- **Proficiency Levels:** Allows users to identify their proficiency level for each skill.
+- **Data Storage:** Saves skills so users can access their information within the application.
 
-Target users
-------------
-- College and university students
-- Recent graduates and early-career job seekers
-- Individuals preparing to enter the workforce
-- Career changers looking to identify transferable skills and develop new qualifications
+Additional career-planning features, including career matching, learning plans, and job application tracking, are planned for future development.
 
-Features
---------
-- Personal skill profiles and skill management
-- Job-target selection and requirements comparison
-- Skill gap detection with recommendations for learning resources
-- Development plan creation and progress tracking
-- Job application tracking and history
-- Simple authentication and dashboard UI
+## Technology Stack
 
-Tech stack
-----------
-- Python 3.10+
-- Flask (web framework)
-- Jinja2 templates (templates/)
-- Static assets: CSS and JS (static/)
-- Optional: Docker for containerized deployment
+- **Backend:** Python and Flask
+- **Frontend:** HTML, CSS, and JavaScript
+- **Database:** SQLAlchemy with a configured database
+- **Deployment:** Render
+- **Version Control:** Git and GitHub
+- **Testing:** Python testing tools
 
-Getting started (local)
------------------------
-Prerequisites:
-- Python 3.10+
-- pip
-- (Optional) virtualenv or venv
+## Getting Started
 
-Install and run:
-```bash
-git clone https://github.com/tooflykayy/career-one-stop.git
-cd career-one-stop
-python -m venv .venv
-source .venv/bin/activate   # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-cp .env.example .env        # create .env from example, fill in values
-export FLASK_APP=app.py
-export FLASK_ENV=development
-flask run
+### View the Live Application
+
+Visit the deployed website:
+
+https://career-one-stop.onrender.com
+
+### Run the Project Locally
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/tooflykayy/career-one-stop.git
+   ```
+
+2. Navigate into the project directory:
+
+   ```bash
+   cd career-one-stop
+   ```
+
+3. Create and activate a virtual environment:
+
+   ```bash
+   python -m venv venv
+   ```
+
+   On macOS or Linux:
+
+   ```bash
+   source venv/bin/activate
+   ```
+
+   On Windows:
+
+   ```bash
+   venv\Scripts\activate
+   ```
+
+4. Install the project dependencies:
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+5. Start the Flask application using the project's configured entry point:
+
+   ```bash
+   flask --app app run
+   ```
+
+6. Open the local address shown in the terminal, typically:
+
+   http://127.0.0.1:5000
+
+## Project Structure
+
+```text
+career-one-stop/
+├── app.py
+├── config.py
+├── models.py
+├── models/
+├── routes/
+├── templates/
+├── static/
+├── tests/
+├── requirements.txt
+└── README.md
+```
+
+**Note:** The project also contains a `models/` package for model-related code.
+
+## Deployment
+
+Career One Stop is deployed on Render, making the application accessible through a public URL.
+
+- **Live application:** https://career-one-stop.onrender.com
+- **Source code:** https://github.com/tooflykayy/career-one-stop
+
+## Future Development
+
+Planned enhancements include:
+
+- **Career Matching:** Compare users' saved skills with the skills associated with different career paths.
+- **Learning Plans:** Help users identify skill gaps and organize learning goals.
+- **Job Application Tracking:** Provide a way to organize job applications and monitor their progress.
+- **Testing and Quality Assurance:** Expand automated tests to verify application functionality and reliability.
+
+## Project Goal
+
+The goal of Career One Stop is to create a practical career-planning tool that helps users understand their existing skills, identify opportunities for growth, and take organized steps toward their professional goals.
