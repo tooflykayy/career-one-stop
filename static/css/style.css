@@ -1,0 +1,297 @@
+:root {
+    --navy: #18263d;
+    --blue: #4263eb;
+    --background: #f5f7fb;
+    --text: #263247;
+    --muted: #68758a;
+    --white: #ffffff;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--background);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    line-height: 1.6;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    padding: 20px 7%;
+    background: var(--white);
+    border-bottom: 1px solid #e5eaf2;
+}
+
+.brand {
+    color: var(--navy);
+    font-size: 1.2rem;
+    font-weight: 750;
+    text-decoration: none;
+}
+
+nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+nav a {
+    color: var(--muted);
+    font-size: 0.9rem;
+    text-decoration: none;
+}
+
+nav a:hover {
+    color: var(--blue);
+}
+
+.container {
+    width: min(1100px, 86%);
+    margin: 0 auto;
+}
+
+.hero {
+    padding: 76px 0 48px;
+}
+
+.eyebrow {
+    color: var(--blue);
+    font-size: 0.8rem;
+    font-weight: 750;
+    letter-spacing: 0.12em;
+}
+
+h1 {
+    max-width: 700px;
+    margin: 12px 0;
+    color: var(--navy);
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    line-height: 1.12;
+}
+
+.hero-text,
+.section-heading p,
+.feature-card p {
+    color: var(--muted);
+}
+
+.hero-text {
+    max-width: 650px;
+    font-size: 1.08rem;
+}
+
+.section-heading {
+    margin: 20px 0;
+}
+
+.section-heading h2 {
+    margin-bottom: 4px;
+    color: var(--navy);
+}
+
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    padding-bottom: 64px;
+}
+
+.feature-card {
+    padding: 26px;
+    background: var(--white);
+    border: 1px solid #e5eaf2;
+    border-radius: 16px;
+    box-shadow: 0 5px 20px rgb(24 38 61 / 4%);
+}
+
+.card-number {
+    color: var(--blue);
+    font-size: 0.85rem;
+    font-weight: 750;
+}
+
+.feature-card h3 {
+    margin: 12px 0 4px;
+    color: var(--navy);
+}
+
+.status {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 4px 10px;
+    background: #edf1ff;
+    border-radius: 20px;
+    color: var(--blue);
+    font-size: 0.8rem;
+}
+
+footer {
+    padding: 24px;
+    background: var(--white);
+    color: var(--muted);
+    text-align: center;
+    font-size: 0.85rem;
+}
+
+@media (max-width: 650px) {
+    .navbar {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .feature-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .hero {
+        padding-top: 48px;
+    }
+}
+
+.page-heading {
+    padding: 48px 0 20px;
+}
+
+.page-heading h1 {
+    margin-top: 8px;
+}
+
+.panel {
+    max-width: 650px;
+    padding: 28px;
+    background: var(--white);
+    border: 1px solid #e5eaf2;
+    border-radius: 16px;
+}
+
+.panel h2,
+.skills-section h2 {
+    color: var(--navy);
+}
+
+.skill-form {
+    display: grid;
+    gap: 10px;
+}
+
+.skill-form label {
+    margin-top: 8px;
+    font-weight: 600;
+}
+
+.skill-form input,
+.skill-form select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d7deea;
+    border-radius: 8px;
+    background: white;
+    color: var(--text);
+    font: inherit;
+}
+
+.primary-button {
+    display: inline-block;
+    width: fit-content;
+    margin-top: 12px;
+    padding: 11px 18px;
+    border: 0;
+    border-radius: 8px;
+    background: var(--blue);
+    color: white;
+    font: inherit;
+    font-weight: 650;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.primary-button:hover {
+    opacity: 0.9;
+}
+
+.skills-section {
+    margin: 36px 0 60px;
+}
+
+.count {
+    padding: 3px 9px;
+    border-radius: 20px;
+    background: #e7ecff;
+    font-size: 0.85rem;
+}
+
+.saved-skills {
+    display: grid;
+    gap: 12px;
+}
+
+.saved-skill {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 22px;
+    border: 1px solid #e5eaf2;
+    border-radius: 12px;
+    background: white;
+}
+
+.saved-skill h3,
+.saved-skill p {
+    margin: 0;
+}
+
+.saved-skill p {
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.delete-button {
+    padding: 8px 12px;
+    border: 1px solid #e2b8b8;
+    border-radius: 8px;
+    background: white;
+    color: #a12d2d;
+    cursor: pointer;
+}
+
+.empty-state {
+    padding: 28px;
+    border: 1px dashed #cbd4e2;
+    border-radius: 12px;
+    color: var(--muted);
+}
+
+.notice {
+    max-width: 650px;
+    margin: 12px 0;
+    padding: 12px 16px;
+    border-radius: 8px;
+}
+
+.notice.success {
+    background: #e8f7ed;
+    color: #216b3a;
+}
+
+.notice.error {
+    background: #fff0f0;
+    color: #a12d2d;
+}
+
+.text-link {
+    color: var(--blue);
+    font-weight: 650;
+    text-decoration: none;
+}
+
+.text-link:hover {
+    text-decoration: underline;
+}

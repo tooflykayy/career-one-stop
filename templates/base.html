@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Career One Stop{% endblock %}</title>
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header class="navbar">
+        <a class="brand" href="{{ url_for('dashboard') }}">Career One Stop</a>
+        <nav>
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('skills') }}">My Skills</a>
+            <a href="{{ url_for('dashboard') }}#career-match">Career Match</a>
+            <a href="{{ url_for('dashboard') }}#learning-plan">Learning Plan</a>
+            <a href="{{ url_for('dashboard') }}#applications">Applications</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>Career One Stop — Build your skills. Plan your future.</p>
+    </footer>
+</body>
+</html>

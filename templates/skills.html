@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}My Skills | Career One Stop{% endblock %}
+
+{% block content %}
+<section class="page-heading">
+    <p class="eyebrow">YOUR CAREER PROFILE</p>
+    <h1>My Skills</h1>
+    <p>Add the skills you have and track your current proficiency.</p>
+</section>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+        <div class="notice {{ category }}">{{ message }}</div>
+    {% endfor %}
+{% endwith %}
+
+<section class="panel">
+    <h2>Add a skill</h2>
+    <form method="POST" action="{{ url_for('skills') }}" class="skill-form">
+        <label for="name">Skill name</label>
+        <input id="name" name="name" maxlength="100"
+               placeholder="e.g., Python, Excel, UX Research" required>
+
+        <label for="category">Category</label>
+        <select id="category" name="category">
+            <option>Technical</option>
+            <option>Data & Analytics</option>
+            <option>Cybersecurity</option>
+            <option>Design & UX</option>
+            <option>Communication</option>
+            <option>Leadership</option>
+            <option>Other</option>
+        </select>
+
+        <label for="proficiency">Proficiency</label>
+        <select id="proficiency" name="proficiency">
+            <option>Beginner</option>
+            <option>Intermediate</option>
+            <option>Advanced</option>
+        </select>
+
+        <button type="submit" class="primary-button">Add skill</button>
+    </form>
+</section>
+
+<section class="skills-section">
+    <h2>Your saved skills <span class="count">{{ skills|length }}</span></h2>
+
+    {% if skills %}
+        <div class="saved-skills">
+            {% for skill in skills %}
+                <article class="saved-skill">
+                    <div>
+                        <h3>{{ skill.name }}</h3>
+                        <p>{{ skill.category }} · {{ skill.proficiency }}</p>
+                    </div>
+                    <form method="POST"
+                          action="{{ url_for('delete_skill', skill_id=skill.id) }}"
+                          onsubmit="return confirm('Remove this skill?');">
+                        <button type="submit" class="delete-button">Remove</button>
+                    </form>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <h3>No skills added yet</h3>
+            <p>Add your first skill above to start building your career profile.</p>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}
