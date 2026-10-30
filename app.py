@@ -4,7 +4,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from datetime import date
 from urllib.parse import urlparse
 from models.models import db, Skill, Application
-
+from career_matching import match_careers
 
 app = Flask(__name__)
 
@@ -345,6 +345,16 @@ def edit_application(application_id):
         "edit_application.html",
         application=application,
         statuses=APPLICATION_STATUSES,
+    )
+@app.route("/career-match")
+def career_match():
+    saved_skills = Skill.query.order_by(Skill.name.asc()).all()
+    careers = match_careers(saved_skills)
+
+    return render_template(
+        "career_match.html",
+        careers=careers,
+        has_skills=bool(saved_skills),
     )
 @app.route("/health")
 def health():
