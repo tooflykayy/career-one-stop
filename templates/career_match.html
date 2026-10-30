@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Career Match | Career One Stop{% endblock %}
+
+{% block content %}
+<h1>Career Match</h1>
+<p>Compare your saved skills with five sample career profiles.</p>
+<p>
+    Your match percentage shows how many listed skill requirements
+    meet the required proficiency level.
+</p>
+
+<p><a href="{{ url_for('skills') }}">Update my skills →</a></p>
+
+{% if not has_skills %}
+<p>
+    You haven't added any skills yet.
+    Add skills to see your matches update.
+</p>
+{% endif %}
+
+<section>
+    {% for career in careers %}
+    <article class="feature-card">
+        <h2>{{ career.title }}</h2>
+        <p>{{ career.description }}</p>
+
+        <p>
+            <strong>{{ career.match_percentage }}% skill match</strong>
+            — {{ career.matched_skills | length }}
+            of {{ career.required_skills | length }} requirements met
+        </p>
+
+        <h3>Requirements met</h3>
+        <ul>
+            {% for skill in career.matched_skills %}
+            <li>{{ skill }}</li>
+            {% else %}
+            <li>No requirements met yet.</li>
+            {% endfor %}
+        </ul>
+
+        <h3>Skills to develop</h3>
+        <ul>
+            {% for gap in career.skill_gaps %}
+            <li>
+                <strong>{{ gap.name }}</strong>:
+                {{ gap.current_level }} →
+                {{ gap.required_level }} required
+            </li>
+            {% else %}
+            <li>You meet all listed skill requirements.</li>
+            {% endfor %}
+        </ul>
+    </article>
+    {% endfor %}
+</section>
+
+<p>These sample profiles support career exploration; requirements vary by employer.</p>
+{% endblock %}
