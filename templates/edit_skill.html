@@ -1,0 +1,57 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container">
+    <h1>Edit Skill</h1>
+    <p>Update your skill information below.</p>
+
+    <form method="POST">
+
+        <label for="name">Skill Name</label>
+        <input
+            type="text"
+            id="name"
+            name="name"
+            value="{{ skill.name }}"
+            maxlength="100"
+            required
+        >
+
+        <label for="category">Category</label>
+        <input
+            type="text"
+            id="category"
+            name="category"
+            value="{{ skill.category }}"
+            maxlength="80"
+        >
+
+        <label for="proficiency">Proficiency Level</label>
+
+        <select id="proficiency" name="proficiency" required>
+            <option value="Beginner"
+                {% if skill.proficiency == "Beginner" %}selected{% endif %}>
+                Beginner
+            </option>
+
+            <option value="Intermediate"
+                {% if skill.proficiency == "Intermediate" %}selected{% endif %}>
+                Intermediate
+            </option>
+
+            <option value="Advanced"
+                {% if skill.proficiency == "Advanced" %}selected{% endif %}>
+                Advanced
+            </option>
+        </select>
+
+        <button type="submit">Save Changes</button>
+
+        <a href="{{ url_for('skills') }}">Cancel</a>
+
+    </form>
+</div>
+
+{% endblock %}

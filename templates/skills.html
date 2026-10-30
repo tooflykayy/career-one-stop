@@ -1,73 +1,210 @@
+
 {% extends "base.html" %}
 
 {% block title %}My Skills | Career One Stop{% endblock %}
 
 {% block content %}
+
 <section class="page-heading">
     <p class="eyebrow">YOUR CAREER PROFILE</p>
     <h1>My Skills</h1>
-    <p>Add the skills you have and track your current proficiency.</p>
+    <p>Build your professional profile, organize your abilities, and track your growth.</p>
 </section>
 
+<!-- Flash Messages -->
 {% with messages = get_flashed_messages(with_categories=true) %}
     {% for category, message in messages %}
         <div class="notice {{ category }}">{{ message }}</div>
     {% endfor %}
 {% endwith %}
 
+
+<!-- Skills Overview -->
+<section class="skills-overview">
+    <div class="panel">
+        <p class="eyebrow">TOTAL SKILLS</p>
+        <h2>{{ skills|length }}</h2>
+        <p>Skills matching your current filters</p>
+    </div>
+</section>
+
+
+<!-- Add Skill Form -->
 <section class="panel">
-    <h2>Add a skill</h2>
+    <h2>Add a New Skill</h2>
+    <p>Record an ability to strengthen your career profile.</p>
+
     <form method="POST" action="{{ url_for('skills') }}" class="skill-form">
-        <label for="name">Skill name</label>
-        <input id="name" name="name" maxlength="100"
-               placeholder="e.g., Python, Excel, UX Research" required>
+
+        <label for="name">Skill Name</label>
+        <input
+            type="text"
+            id="name"
+            name="name"
+            maxlength="100"
+            placeholder="e.g., Python, Excel, UX Research"
+            required
+        >
 
         <label for="category">Category</label>
         <select id="category" name="category">
-            <option>Technical</option>
-            <option>Data & Analytics</option>
-            <option>Cybersecurity</option>
-            <option>Design & UX</option>
-            <option>Communication</option>
-            <option>Leadership</option>
-            <option>Other</option>
+            <option value="Technical">Technical</option>
+            <option value="Data & Analytics">Data & Analytics</option>
+            <option value="Cybersecurity">Cybersecurity</option>
+            <option value="Design & UX">Design & UX</option>
+            <option value="Communication">Communication</option>
+            <option value="Leadership">Leadership</option>
+            <option value="Other">Other</option>
         </select>
 
-        <label for="proficiency">Proficiency</label>
+        <label for="proficiency">Proficiency Level</label>
         <select id="proficiency" name="proficiency">
-            <option>Beginner</option>
-            <option>Intermediate</option>
-            <option>Advanced</option>
+            <option value="Beginner">Beginner</option>
+            <option value="Intermediate">Intermediate</option>
+            <option value="Advanced">Advanced</option>
         </select>
 
-        <button type="submit" class="primary-button">Add skill</button>
+        <button type="submit" class="primary-button">
+            + Add Skill
+        </button>
+
     </form>
 </section>
 
+
+<!-- Search and Filters -->
+<section class="panel">
+    <h2>Find Your Skills</h2>
+
+    <form method="GET" action="{{ url_for('skills') }}" class="filter-form">
+
+        <label for="search">Search skills</label>
+        <input
+            type="text"
+            id="search"
+            name="search"
+            placeholder="Search by skill name..."
+            value="{{ search }}"
+        >
+
+        <label for="category-filter">Filter by Category</label>
+        <select id="category-filter" name="category">
+            <option value="">All Categories</option>
+
+            {% for category in categories %}
+                <option value="{{ category }}"
+                    {% if category_filter == category %}selected{% endif %}>
+                    {{ category }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <label for="proficiency-filter">Filter by Proficiency</label>
+        <select id="proficiency-filter" name="proficiency">
+            <option value="">All Levels</option>
+
+            <option value="Beginner"
+                {% if proficiency_filter == "Beginner" %}selected{% endif %}>
+                Beginner
+            </option>
+
+            <option value="Intermediate"
+                {% if proficiency_filter == "Intermediate" %}selected{% endif %}>
+                Intermediate
+            </option>
+
+            <option value="Advanced"
+                {% if proficiency_filter == "Advanced" %}selected{% endif %}>
+                Advanced
+            </option>
+        </select>
+
+        <button type="submit" class="primary-button">
+            Apply Filters
+        </button>
+
+        <a href="{{ url_for('skills') }}" class="secondary-button">
+            Clear Filters
+        </a>
+
+    </form>
+</section>
+
+
+<!-- Saved Skills -->
 <section class="skills-section">
-    <h2>Your saved skills <span class="count">{{ skills|length }}</span></h2>
+
+    <h2>
+        Your Saved Skills
+        <span class="count">{{ skills|length }}</span>
+    </h2>
 
     {% if skills %}
+
         <div class="saved-skills">
+
             {% for skill in skills %}
+
                 <article class="saved-skill">
-                    <div>
+
+                    <div class="skill-information">
+
                         <h3>{{ skill.name }}</h3>
-                        <p>{{ skill.category }} · {{ skill.proficiency }}</p>
+
+                        <p>{{ skill.category }}</p>
+
+                        <span class="proficiency-badge {{ skill.proficiency|lower }}">
+                            {{ skill.proficiency }}
+                        </span>
+
                     </div>
-                    <form method="POST"
-                          action="{{ url_for('delete_skill', skill_id=skill.id) }}"
-                          onsubmit="return confirm('Remove this skill?');">
-                        <button type="submit" class="delete-button">Remove</button>
-                    </form>
+
+                    <div class="skill-actions">
+
+                        <a
+                            href="{{ url_for('edit_skill', skill_id=skill.id) }}"
+                            class="secondary-button">
+                            Edit
+                        </a>
+
+                        <form
+                            method="POST"
+                            action="{{ url_for('delete_skill', skill_id=skill.id) }}"
+                            onsubmit="return confirm('Are you sure you want to remove this skill?');">
+
+                            <button type="submit" class="delete-button">
+                                Remove
+                            </button>
+
+                        </form>
+
+                    </div>
+
                 </article>
+
             {% endfor %}
+
         </div>
+
     {% else %}
+
         <div class="empty-state">
-            <h3>No skills added yet</h3>
-            <p>Add your first skill above to start building your career profile.</p>
+
+            <h3>No skills found</h3>
+
+            {% if search or category_filter or proficiency_filter %}
+                <p>Try changing your search or filters to find your saved skills.</p>
+                <a href="{{ url_for('skills') }}" class="secondary-button">
+                    View All Skills
+                </a>
+            {% else %}
+                <p>You haven't added any skills yet. Add your first skill to start building your career profile.</p>
+            {% endif %}
+
         </div>
+
     {% endif %}
+
 </section>
+
 {% endblock %}
