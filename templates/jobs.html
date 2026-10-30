@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Recommended Jobs | Career One Stop{% endblock %}
+
+{% block content %}
+<h1>Recommended Jobs</h1>
+<p>
+    These fictional demo listings are ranked using the skill
+    requirements of their associated career profiles.
+    They are not real vacancies.
+</p>
+
+<p><a href="{{ url_for('skills') }}">Update my skills →</a></p>
+
+{% if not has_skills %}
+<p>Add your skills to personalize the rankings. All scores currently show 0%.</p>
+{% endif %}
+
+<section>
+    {% for job in jobs %}
+    <article class="feature-card">
+        <h2>{{ job.title }}</h2>
+        <p><strong>Demo listing</strong></p>
+        <p>{{ job.company }} · {{ job.location }}</p>
+        <p>{{ job.description }}</p>
+
+        <p>
+            <strong>{{ job.match_percentage }}% career-profile skill match</strong>
+        </p>
+        <p>Based on the {{ job.career_title }} sample profile.</p>
+
+        <h3>Requirements met</h3>
+        <ul>
+            {% for skill in job.matched_skills %}
+            <li>{{ skill }}</li>
+            {% else %}
+            <li>No requirements met yet.</li>
+            {% endfor %}
+        </ul>
+
+        <h3>Skills to develop</h3>
+        <ul>
+            {% for gap in job.skill_gaps %}
+            <li>
+                <strong>{{ gap.name }}</strong>:
+                {{ gap.current_level }} →
+                {{ gap.required_level }} required
+            </li>
+            {% else %}
+            <li>You meet all listed profile requirements.</li>
+            {% endfor %}
+        </ul>
+        <form method="POST"
+      action="{{ url_for('save_recommended_job', job_id=job.id) }}">
+    <button type="submit">Save to Applications</button>
+</form>
+    </article>
+    {% else %}
+    <p>No demo listings are available.</p>
+    {% endfor %}
+</section>
+{% endblock %}
