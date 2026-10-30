@@ -5,6 +5,9 @@ from datetime import date
 from urllib.parse import urlparse
 from models.models import db, Skill, Application
 from career_matching import match_careers
+from job_matching import recommend_jobs
+from flask import abort
+from job_data import JOBS
 
 app = Flask(__name__)
 
@@ -356,6 +359,51 @@ def career_match():
         careers=careers,
         has_skills=bool(saved_skills),
     )
+@app.route("/jobs")
+def recommended_jobs():
+    saved_skills = Skill.query.order_by(Skill.name.asc()).all()
+    jobs = recommend_jobs(saved_skills)
+
+    return render_template(
+        "jobs.html",
+        jobs=jobs,
+        has_skills=bool(saved_skills),
+    )
+@app.route("/jobs/<job_id>/save", methods=["POST"])
+def save_recommended_job(job_id):
+    job = next(
+        (listing for listing in JOBS if listing["id"] == job_id),
+        None,
+    )
+
+    if job is None:
+        abort(404)
+
+    existing = Application.query.filter_by(
+        company=job["company"],
+        job_title=job["title"],
+    ).first()
+
+    if existing:
+        flash("This job is already in your applications.", "info")
+    else:
+        application = Application(
+            company=job["company"],
+            job_title=job["title"],
+            status="Saved",
+            notes=(
+                "Fictional demo listing saved from Recommended Jobs. "
+                f"Location: {job['location']}. "
+                f"{job['description']}"
+            ),
+        )
+
+        db.session.add(application)
+        db.session.commit()
+        flash("Job saved to your applications!", "success")
+
+    return redirect(url_for("applications"))
+
 @app.route("/health")
 def health():
     return {"status": "healthy"}, 200
