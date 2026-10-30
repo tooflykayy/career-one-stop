@@ -1,8 +1,5 @@
 # Career One Stop
-
-**Live Website:** https://career-one-stop.onrender.com  
 **GitHub Repository:** https://github.com/tooflykayy/career-one-stop
-
 ## Project Overview
 
 Career One Stop is a web application designed to help users organize their skills and take steps toward their career goals. The project provides a centralized place for users to record their skills and begin planning their professional development.
@@ -88,16 +85,45 @@ https://career-one-stop.onrender.com
 
 ```text
 career-one-stop/
+│
 ├── app.py
 ├── config.py
-├── models.py
-├── models/
-├── routes/
-├── templates/
-├── static/
-├── tests/
 ├── requirements.txt
-└── README.md
+├── README.md
+│
+├── models/
+│   ├── __init__.py
+│   └── models.py
+│
+├── routes/
+│   ├── __init__.py
+│   ├── dashboard.py
+│   ├── skills.py
+│   ├── career_match.py
+│   ├── learning_plan.py
+│   └── applications.py
+│
+├── templates/
+│   ├── base.html
+│   ├── dashboard.html
+│   ├── skills.html
+│   ├── edit_skill.html
+│   ├── career_match.html
+│   ├── learning_plan.html
+│   └── applications.html
+│
+├── static/
+│   ├── css/
+│   │   └── style.css
+│   ├── js/
+│   │   └── main.js
+│   └── images/
+│
+└── tests/
+    ├── __init__.py
+    ├── test_app.py
+    ├── test_skills.py
+    └── test_routes.py
 ```
 
 **Note:** The project also contains a `models/` package for model-related code.
