@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block title %}Job Applications | Career One Stop{% endblock %}
+
+{% block content %}
+<section class="section-heading">
+    <h1>My Job Applications</h1>
+    <p>Save jobs and track applications, interviews, and follow-ups.</p>
+</section>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+        <p role="alert" class="flash {{ category }}">
+            {{ message }}
+        </p>
+    {% endfor %}
+{% endwith %}
+
+<section class="feature-card">
+    <h2>Add an Application</h2>
+
+    <form method="POST" action="{{ url_for('applications') }}">
+        <p>
+            <label for="company">Company *</label><br>
+            <input
+                id="company"
+                name="company"
+                type="text"
+                maxlength="150"
+                value="{{ request.form.get('company', '') }}"
+                required>
+        </p>
+
+        <p>
+            <label for="job_title">Job Title *</label><br>
+            <input
+                id="job_title"
+                name="job_title"
+                type="text"
+                maxlength="150"
+                value="{{ request.form.get('job_title', '') }}"
+                required>
+        </p>
+
+        <p>
+            <label for="job_url">Job Link</label><br>
+            <input
+                id="job_url"
+                name="job_url"
+                type="url"
+                maxlength="1000"
+                placeholder="https://example.com/jobs/123"
+                value="{{ request.form.get('job_url', '') }}">
+        </p>
+
+        <p>
+            <label for="status">Status</label><br>
+            <select id="status" name="status">
+                {% for status in statuses %}
+                    <option
+                        value="{{ status }}"
+                        {% if request.form.get('status', 'Saved') == status %}
+                            selected
+                        {% endif %}>
+                        {{ status }}
+                    </option>
+                {% endfor %}
+            </select>
+        </p>
+
+        <p>
+            <label for="date_applied">Date Applied</label><br>
+            <input
+                id="date_applied"
+                name="date_applied"
+                type="date"
+                value="{{ request.form.get('date_applied', '') }}">
+        </p>
+
+        <p>
+            <label for="follow_up_date">Interview or Follow-up Date</label><br>
+            <input
+                id="follow_up_date"
+                name="follow_up_date"
+                type="date"
+                value="{{ request.form.get('follow_up_date', '') }}">
+        </p>
+
+        <p>
+            <label for="notes">Notes</label><br>
+            <textarea
+                id="notes"
+                name="notes"
+                rows="4">{{ request.form.get('notes', '') }}</textarea>
+        </p>
+
+        <button class="primary-button" type="submit">
+            Save Application
+        </button>
+    </form>
+</section>
+
+<section class="section-heading">
+    <h2>Saved Applications</h2>
+    <p>{{ applications|length }} application(s) saved.</p>
+</section>
+
+<section class="feature-grid">
+    {% for application in applications %}
+        <article class="feature-card">
+            <h3>{{ application.job_title }}</h3>
+            <p>
+    <a
+        class="text-link"
+        href="{{ url_for('edit_application', application_id=application.id) }}">
+        Edit Application
+    </a>
+</p>
+            <p><strong>Company:</strong> {{ application.company }}</p>
+            <p><strong>Status:</strong> {{ application.status }}</p>
+
+            <p>
+                <strong>Date Applied:</strong>
+                {{ application.date_applied or 'Not entered' }}
+            </p>
+
+            <p>
+                <strong>Interview or Follow-up:</strong>
+                {{ application.follow_up_date or 'Not entered' }}
+            </p>
+
+            {% if application.job_url %}
+                <p>
+                    <a
+                        class="text-link"
+                        href="{{ application.job_url }}"
+                        target="_blank"
+                        rel="noopener noreferrer">
+                        View Job Listing
+                    </a>
+                </p>
+            {% endif %}
+
+            {% if application.notes %}
+                <p><strong>Notes:</strong> {{ application.notes }}</p>
+            {% endif %}
+                        <form
+                method="POST"
+                action="{{ url_for('update_application_status', application_id=application.id) }}">
+
+                <p>
+                    <label for="status-{{ application.id }}">
+                        Update Status
+                    </label>
+
+                    <select
+                        id="status-{{ application.id }}"
+                        name="status">
+
+                        {% for status in statuses %}
+                            <option
+                                value="{{ status }}"
+                                {% if application.status == status %}
+                                    selected
+                                {% endif %}>
+                                {{ status }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </p>
+
+                <button class="primary-button" type="submit">
+                    Update Status
+                </button>
+            </form>
+
+            <form
+                method="POST"
+                action="{{ url_for('delete_application', application_id=application.id) }}"
+                onsubmit="return confirm('Delete this application?');">
+
+                <p>
+                    <button type="submit">
+                        Delete Application
+                    </button>
+                </p>
+            </form>
+        </article>
+    {% else %}
+        <p>No applications yet. Add your first one above.</p>
+    {% endfor %}
+</section>
+{% endblock %}
