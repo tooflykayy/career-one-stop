@@ -1,8 +1,5 @@
 # Career One Stop
 
-**Live Website:** https://career-one-stop.onrender.com  
-**GitHub Repository:** https://github.com/tooflykayy/career-one-stop
-
 ## Project Overview
 
 Career One Stop is a web application designed to help users organize their skills and take steps toward their career goals. The project provides a centralized place for users to record their skills and begin planning their professional development.
