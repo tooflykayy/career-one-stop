@@ -1,51 +1,100 @@
+```html
 {% extends "base.html" %}
 
 {% block title %}Dashboard | Career One Stop{% endblock %}
 
 {% block content %}
-<section class="hero">
-    <p class="eyebrow">YOUR CAREER JOURNEY STARTS HERE</p>
-    <h1>Turn your career goals into a plan.</h1>
-    <p class="hero-text">
-        Track your skills, discover what you need for your target career,
-        and organize your next steps in one place.
-    </p>
-    <a class="primary-button" href="{{ url_for('skills') }}">Build my skills profile</a>
+
+<section class="dashboard-welcome">
+    <div>
+        <p class="eyebrow">YOUR CAREER JOURNEY</p>
+        <h1>Build your future, one step at a time.</h1>
+        <p>
+            Keep track of your skills, identify opportunities for growth,
+            and take the next step toward your career goals.
+        </p>
+        <a class="primary-button" href="{{ url_for('skills') }}">
+            Manage my skills
+        </a>
+    </div>
 </section>
 
-<section class="section-heading">
-    <h2>Your Career Toolkit</h2>
-    <p>Choose a feature to get started.</p>
-</section>
-
-<section class="feature-grid">
-    <article class="feature-card">
-        <span class="card-number">01</span>
-        <h3>My Skills</h3>
-        <p>Save your current skills and proficiency levels.</p>
-        <p><strong>{{ skills|length }}</strong> skills saved</p>
-        <a class="text-link" href="{{ url_for('skills') }}">Manage skills →</a>
+<section class="dashboard-summary">
+    <article class="summary-card">
+        <span class="summary-label">Skills Added</span>
+        <h2>{{ skills|length }}</h2>
+        <p>Skills in your career profile</p>
     </article>
 
-    <article class="feature-card" id="career-match">
-        <span class="card-number">02</span>
-        <h3>Career Match</h3>
-        <p>Compare your skills with the requirements of a target job.</p>
-        <span class="status">Coming next</span>
+    <article class="summary-card">
+        <span class="summary-label">Career Development</span>
+        <h2>01</h2>
+        <p>Available tools to get started</p>
     </article>
 
-    <article class="feature-card" id="learning-plan">
-        <span class="card-number">03</span>
-        <h3>Learning Plan</h3>
-        <p>Organize learning resources and track your progress.</p>
-        <span class="status">Coming next</span>
-    </article>
-
-    <article class="feature-card" id="applications">
-        <span class="card-number">04</span>
-        <h3>Job Applications</h3>
-        <p>Keep track of applications, interviews, and follow-ups.</p>
-        <span class="status">Coming next</span>
+    <article class="summary-card">
+        <span class="summary-label">Next Step</span>
+        <h2>Explore</h2>
+        <p>Continue building your profile</p>
     </article>
 </section>
+
+<section class="dashboard-section">
+    <div class="section-heading">
+        <div>
+            <p class="eyebrow">YOUR TOOLS</p>
+            <h2>Your Career Toolkit</h2>
+            <p>Everything you need to organize your career development.</p>
+        </div>
+    </div>
+
+    <section class="feature-grid">
+
+        <article class="feature-card">
+            <span class="card-number">01</span>
+            <h3>Skills Management</h3>
+            <p>
+                Add skills, organize them by category, and track
+                your proficiency levels.
+            </p>
+            <span class="status available">Available</span>
+            <a class="text-link" href="{{ url_for('skills') }}">
+                Manage skills →
+            </a>
+        </article>
+
+        <article class="feature-card">
+            <span class="card-number">02</span>
+            <h3>Career Match</h3>
+            <p>
+                Compare your current skills with the qualifications
+                needed for your target career.
+            </p>
+            <span class="status">Coming soon</span>
+        </article>
+
+        <article class="feature-card">
+            <span class="card-number">03</span>
+            <h3>Learning Plan</h3>
+            <p>
+                Identify skill gaps and organize learning goals
+                to support your professional growth.
+            </p>
+            <span class="status">Coming soon</span>
+        </article>
+
+        <article class="feature-card">
+            <span class="card-number">04</span>
+            <h3>Job Applications</h3>
+            <p>
+                Organize job applications, monitor interview
+                progress, and keep track of follow-ups.
+            </p>
+            <span class="status">Coming soon</span>
+        </article>
+
+    </section>
+</section>
+
 {% endblock %}
+```
