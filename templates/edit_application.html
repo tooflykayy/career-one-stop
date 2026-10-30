@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Application | Career One Stop{% endblock %}
+
+{% block content %}
+<section class="section-heading">
+    <h1>Edit Application</h1>
+    <p>Update your saved job information.</p>
+</section>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+        <p role="alert" class="flash {{ category }}">
+            {{ message }}
+        </p>
+    {% endfor %}
+{% endwith %}
+
+<section class="feature-card">
+    <form
+        method="POST"
+        action="{{ url_for('edit_application', application_id=application.id) }}">
+
+        <p>
+            <label for="company">Company *</label><br>
+            <input
+                id="company"
+                name="company"
+                type="text"
+                maxlength="150"
+                value="{{ request.form.get('company', application.company) }}"
+                required>
+        </p>
+
+        <p>
+            <label for="job_title">Job Title *</label><br>
+            <input
+                id="job_title"
+                name="job_title"
+                type="text"
+                maxlength="150"
+                value="{{ request.form.get('job_title', application.job_title) }}"
+                required>
+        </p>
+
+        <p>
+            <label for="job_url">Job Link</label><br>
+            <input
+                id="job_url"
+                name="job_url"
+                type="url"
+                maxlength="1000"
+                value="{{ request.form.get('job_url', application.job_url or '') }}">
+        </p>
+
+        <p>
+            <label for="status">Status</label><br>
+            <select id="status" name="status">
+                {% for status in statuses %}
+                    <option
+                        value="{{ status }}"
+                        {% if request.form.get('status', application.status) == status %}
+                            selected
+                        {% endif %}>
+                        {{ status }}
+                    </option>
+                {% endfor %}
+            </select>
+        </p>
+
+        <p>
+            <label for="date_applied">Date Applied</label><br>
+            <input
+                id="date_applied"
+                name="date_applied"
+                type="date"
+                value="{{ request.form.get('date_applied', application.date_applied.isoformat() if application.date_applied else '') }}">
+        </p>
+
+        <p>
+            <label for="follow_up_date">Interview or Follow-up Date</label><br>
+            <input
+                id="follow_up_date"
+                name="follow_up_date"
+                type="date"
+                value="{{ request.form.get('follow_up_date', application.follow_up_date.isoformat() if application.follow_up_date else '') }}">
+        </p>
+
+        <p>
+            <label for="notes">Notes</label><br>
+            <textarea
+                id="notes"
+                name="notes"
+                rows="4">{{ request.form.get('notes', application.notes or '') }}</textarea>
+        </p>
+
+        <button class="primary-button" type="submit">
+            Save Changes
+        </button>
+
+        <p>
+            <a href="{{ url_for('applications') }}">Cancel</a>
+        </p>
+    </form>
+</section>
+{% endblock %}
