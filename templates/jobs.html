@@ -52,6 +52,7 @@
         </ul>
         <form method="POST"
       action="{{ url_for('save_recommended_job', job_id=job.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <button type="submit">Save to Applications</button>
 </form>
     </article>
