@@ -76,9 +76,7 @@ pip install -r requirements.txt
 
 ### 5. Configure Environment Variables
 
-Configure the environment variables required by the application, including its secret key and database connection settings, if applicable.
-
-Do not commit secret keys, passwords, or other sensitive configuration values to GitHub.
+Configure the environment variables required by the application, including its secret key and database connection settings.
 
 ### 6. Run the Application
 
