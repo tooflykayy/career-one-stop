@@ -42,6 +42,11 @@
 
 <p><a href="{{ url_for('skills') }}">Update my skills →</a></p>
 <h2>Resources for your skill gaps</h2>
+<p>
+    Explore resources related to your skill gaps.
+    Some external courses require a free provider account.
+    Completing a resource does not automatically change your skill proficiency.
+</p>
 
 {% for resource in resources %}
 <article class="feature-card">
@@ -62,8 +67,8 @@
 </article>
 {% else %}
 <p>
-    No resources from the current catalog match your skill gaps.
-    The catalog currently covers Python, SQL, Git, and Problem Solving.
+    No learning resources match your current skill gaps.
+    If you meet all listed requirements, try selecting another career.
 </p>
 {% endfor %}
 <h2>Saved learning activities</h2>
