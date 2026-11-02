@@ -2,12 +2,21 @@ import os
 from flask import Flask, render_template, request, redirect, url_for, flash
 from datetime import date
 from urllib.parse import urlparse
-from models.models import db, Skill, Application, LearningActivity
+from models.models import db, Skill, Application, LearningActivity, User
 from learning_data import LEARNING_RESOURCES
 from career_matching import match_careers
 from job_matching import recommend_jobs
 from flask import abort
+from flask_wtf.csrf import CSRFProtect
 from job_data import JOBS
+from flask_login import (
+    LoginManager,
+    current_user,
+    login_user,
+    logout_user,
+    login_required,
+)
+from sqlalchemy.exc import IntegrityError
 
 app = Flask(__name__)
 
@@ -28,21 +37,49 @@ elif database_url.startswith("postgresql://"):
     database_url = database_url.replace(
         "postgresql://", "postgresql+psycopg://", 1
     )
+
 app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
+csrf = CSRFProtect(app)
 db.init_app(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "login"
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    try:
+        return db.session.get(User, int(user_id))
+    except (TypeError, ValueError):
+        return None
+
 
 with app.app_context():
     db.create_all()
 
+@app.before_request
+def require_account():
+    public_endpoints = {
+        "login",
+        "register",
+        "static",
+        "health",
+    }
+
+    if (
+        request.endpoint is not None
+        and request.endpoint not in public_endpoints
+        and not current_user.is_authenticated
+    ):
+        return login_manager.unauthorized()
 
 ALLOWED_LEVELS = {"Beginner", "Intermediate", "Advanced"}
 
 
 @app.route("/")
 def dashboard():
-    skills = Skill.query.order_by(Skill.name.asc()).all()
+    skills = Skill.query.filter_by(user_id=current_user.id).order_by(Skill.name.asc()).all()
 
     total_skills = len(skills)
     beginner_count = sum(s.proficiency == "Beginner" for s in skills)
@@ -76,11 +113,11 @@ def skills():
             flash("Please choose a valid proficiency level.", "error")
         else:
             skill = Skill(
+                user_id=current_user.id,
                 name=name,
                 category=category or "Other",
-                proficiency=proficiency
+                proficiency=proficiency,
             )
-
             db.session.add(skill)
             db.session.commit()
 
@@ -91,8 +128,7 @@ def skills():
     category_filter = request.args.get("category", "").strip()
     proficiency_filter = request.args.get("proficiency", "").strip()
 
-    query = Skill.query
-
+    query = Skill.query.filter_by(user_id=current_user.id)
     if search:
         query = query.filter(Skill.name.ilike(f"%{search}%"))
 
@@ -107,6 +143,7 @@ def skills():
     categories = [
         category[0]
         for category in db.session.query(Skill.category)
+        .filter(Skill.user_id == current_user.id)
         .distinct()
         .order_by(Skill.category.asc())
         .all()
@@ -124,7 +161,10 @@ def skills():
 
 @app.route("/skills/<int:skill_id>/edit", methods=["GET", "POST"])
 def edit_skill(skill_id):
-    skill = db.get_or_404(Skill, skill_id)
+    skill = Skill.query.filter_by(
+    id=skill_id,
+    user_id=current_user.id,
+).first_or_404()
 
     if request.method == "POST":
         name = request.form.get("name", "").strip()
@@ -154,7 +194,10 @@ def edit_skill(skill_id):
 
 @app.route("/skills/<int:skill_id>/delete", methods=["POST"])
 def delete_skill(skill_id):
-    skill = db.get_or_404(Skill, skill_id)
+    skill = Skill.query.filter_by(
+    id=skill_id,
+    user_id=current_user.id,
+).first_or_404()
 
     name = skill.name
 
@@ -227,6 +270,7 @@ def applications():
                 flash(error, "error")
         else:
             application = Application(
+                user_id=current_user.id,
                 company=company,
                 job_title=job_title,
                 job_url=job_url or None,
@@ -242,21 +286,26 @@ def applications():
             flash("Application saved successfully!", "success")
             return redirect(url_for("applications"))
 
-    saved_applications = Application.query.order_by(
-        Application.id.desc()
-    ).all()
+    saved_applications = Application.query.filter_by(
+        user_id=current_user.id
+    ).order_by(Application.id.desc()).all()
 
     return render_template(
         "applications.html",
         applications=saved_applications,
         statuses=APPLICATION_STATUSES,
     )
+
+
 @app.route(
     "/applications/<int:application_id>/status",
     methods=["POST"],
 )
 def update_application_status(application_id):
-    application = db.get_or_404(Application, application_id)
+    application = Application.query.filter_by(
+        id=application_id,
+        user_id=current_user.id,
+    ).first_or_404()
     new_status = request.form.get("status", "").strip()
 
     if new_status not in APPLICATION_STATUSES:
@@ -274,7 +323,10 @@ def update_application_status(application_id):
     methods=["POST"],
 )
 def delete_application(application_id):
-    application = db.get_or_404(Application, application_id)
+    application = Application.query.filter_by(
+        id=application_id,
+        user_id=current_user.id,
+    ).first_or_404()
     db.session.delete(application)
     db.session.commit()
 
@@ -285,7 +337,10 @@ def delete_application(application_id):
     methods=["GET", "POST"],
 )
 def edit_application(application_id):
-    application = db.get_or_404(Application, application_id)
+    application = Application.query.filter_by(
+        id=application_id,
+        user_id=current_user.id,
+    ).first_or_404()
 
     if request.method == "POST":
         company = request.form.get("company", "").strip()
@@ -356,7 +411,7 @@ def edit_application(application_id):
     )
 @app.route("/career-match")
 def career_match():
-    saved_skills = Skill.query.order_by(Skill.name.asc()).all()
+    saved_skills = Skill.query.filter_by(user_id=current_user.id).order_by(Skill.name.asc()).all()
     careers = match_careers(saved_skills)
 
     return render_template(
@@ -366,7 +421,7 @@ def career_match():
     )
 @app.route("/jobs")
 def recommended_jobs():
-    saved_skills = Skill.query.order_by(Skill.name.asc()).all()
+    saved_skills = Skill.query.filter_by(user_id=current_user.id).order_by(Skill.name.asc()).all()
     jobs = recommend_jobs(saved_skills)
 
     return render_template(
@@ -385,6 +440,7 @@ def save_recommended_job(job_id):
         abort(404)
 
     existing = Application.query.filter_by(
+        user_id=current_user.id,
         company=job["company"],
         job_title=job["title"],
     ).first()
@@ -393,6 +449,7 @@ def save_recommended_job(job_id):
         flash("This job is already in your applications.", "info")
     else:
         application = Application(
+            user_id=current_user.id,
             company=job["company"],
             job_title=job["title"],
             status="Saved",
@@ -413,7 +470,7 @@ LEARNING_STATUSES = ("Planned", "In Progress", "Completed")
 
 @app.route("/learning-plan")
 def learning_plan():
-    saved_skills = Skill.query.order_by(Skill.name.asc()).all()
+    saved_skills = Skill.query.filter_by(user_id=current_user.id).order_by(Skill.name.asc()).all()
     careers = match_careers(saved_skills)
 
     selected_id = request.args.get("career_id", careers[0]["id"])
@@ -438,9 +495,9 @@ def learning_plan():
     ]
 
     activities = LearningActivity.query.filter_by(
-        career_id=selected_id
+        user_id=current_user.id,
+        career_id=selected_id,
     ).order_by(LearningActivity.id.desc()).all()
-
     return render_template(
         "learning_plan.html",
         careers=careers,
@@ -456,7 +513,9 @@ def save_learning_activity():
     career_id = request.form.get("career_id", "")
     resource_id = request.form.get("resource_id", "")
 
-    careers = match_careers(Skill.query.all())
+    careers = match_careers(
+    Skill.query.filter_by(user_id=current_user.id).all()
+)
     career = next(
         (item for item in careers if item["id"] == career_id),
         None,
@@ -478,6 +537,7 @@ def save_learning_activity():
         abort(400)
 
     existing = LearningActivity.query.filter_by(
+        user_id=current_user.id,
         career_id=career_id,
         resource_url=resource["url"],
     ).first()
@@ -486,6 +546,7 @@ def save_learning_activity():
         flash("This resource is already in your learning plan.", "info")
     else:
         activity = LearningActivity(
+            user_id=current_user.id,
             career_id=career_id,
             skill_name=resource["skill_name"],
             resource_title=resource["title"],
@@ -500,7 +561,10 @@ def save_learning_activity():
 
 @app.route("/learning-plan/<int:activity_id>/status", methods=["POST"])
 def update_learning_status(activity_id):
-    activity = db.get_or_404(LearningActivity, activity_id)
+    activity = LearningActivity.query.filter_by(
+        id=activity_id,
+        user_id=current_user.id,
+    ).first_or_404()
     new_status = request.form.get("status", "").strip()
 
     if new_status not in LEARNING_STATUSES:
@@ -514,6 +578,73 @@ def update_learning_status(activity_id):
         url_for("learning_plan", career_id=activity.career_id)
     )
 
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if current_user.is_authenticated:
+        return redirect(url_for("dashboard"))
+
+    if request.method == "POST":
+        email = request.form.get("email", "").strip().casefold()
+        password = request.form.get("password", "")
+        confirm = request.form.get("confirm_password", "")
+
+        if (
+            len(email) > 254
+            or email.count("@") != 1
+            or not all(email.split("@"))
+            or any(character.isspace() for character in email)
+        ):
+            flash("Enter a valid email address.", "error")
+        elif not 12 <= len(password) <= 128:
+            flash("Use a password between 12 and 128 characters.", "error")
+        elif password != confirm:
+            flash("Passwords do not match.", "error")
+        elif User.query.filter_by(email=email).first():
+            flash("Unable to register with that email. Try logging in.", "error")
+        else:
+            user = User(email=email)
+            user.set_password(password)
+            db.session.add(user)
+
+            try:
+                db.session.commit()
+            except IntegrityError:
+                db.session.rollback()
+                flash("Unable to register with that email. Try logging in.", "error")
+            else:
+                login_user(user)
+                flash("Your account has been created!", "success")
+                return redirect(url_for("dashboard"))
+
+    return render_template("register.html")
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for("dashboard"))
+
+    if request.method == "POST":
+        email = request.form.get("email", "").strip().casefold()
+        password = request.form.get("password", "")
+        user = User.query.filter_by(email=email).first()
+
+        if user and user.check_password(password):
+            login_user(user)
+            flash("You are logged in.", "success")
+            return redirect(url_for("dashboard"))
+
+        flash("Email or password is incorrect.", "error")
+
+    return render_template("login.html")
+
+
+@app.route("/logout", methods=["POST"])
+@login_required
+def logout():
+    logout_user()
+    flash("You are logged out.", "info")
+    return redirect(url_for("login"))
 
 @app.route("/health")
 def health():

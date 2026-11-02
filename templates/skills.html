@@ -35,6 +35,7 @@
     <p>Record an ability to strengthen your career profile.</p>
 
     <form method="POST" action="{{ url_for('skills') }}" class="skill-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
         <label for="name">Skill Name</label>
         <input
@@ -171,6 +172,7 @@
                             method="POST"
                             action="{{ url_for('delete_skill', skill_id=skill.id) }}"
                             onsubmit="return confirm('Are you sure you want to remove this skill?');">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                             <button type="submit" class="delete-button">
                                 Remove

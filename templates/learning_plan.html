@@ -52,6 +52,7 @@
         Open resource →
     </a>
     <form method="POST" action="{{ url_for('save_learning_activity') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <input type="hidden" name="career_id"
            value="{{ selected_career.id }}">
     <input type="hidden" name="resource_id"
@@ -73,6 +74,7 @@
     <p>Status: {{ activity.status }}</p>
     <form method="POST"
       action="{{ url_for('update_learning_status', activity_id=activity.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <label for="status-{{ activity.id }}">Progress</label>
     <select name="status" id="status-{{ activity.id }}">
         {% for status in statuses %}

@@ -17,6 +17,17 @@
             <a href="{{ url_for('recommended_jobs') }}">Recommended Jobs</a>
             <a href="{{ url_for('learning_plan') }}">Learning Plan</a>
             <a href="{{ url_for('applications') }}">Applications</a>
+            {% if current_user.is_authenticated %}
+    <span>{{ current_user.email }}</span>
+<form method="POST" action="{{ url_for('logout') }}"
+      style="display: inline;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit">Log out</button>
+</form>
+{% else %}
+    <a href="{{ url_for('login') }}">Log in</a>
+    <a href="{{ url_for('register') }}">Sign up</a>
+{% endif %}
         </nav>
     </header>
 
