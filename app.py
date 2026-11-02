@@ -3,7 +3,8 @@ import os
 from flask import Flask, render_template, request, redirect, url_for, flash
 from datetime import date
 from urllib.parse import urlparse
-from models.models import db, Skill, Application
+from models.models import db, Skill, Application, LearningActivity
+from learning_data import LEARNING_RESOURCES
 from career_matching import match_careers
 from job_matching import recommend_jobs
 from flask import abort
@@ -403,6 +404,112 @@ def save_recommended_job(job_id):
         flash("Job saved to your applications!", "success")
 
     return redirect(url_for("applications"))
+LEARNING_STATUSES = ("Planned", "In Progress", "Completed")
+
+
+@app.route("/learning-plan")
+def learning_plan():
+    saved_skills = Skill.query.order_by(Skill.name.asc()).all()
+    careers = match_careers(saved_skills)
+
+    selected_id = request.args.get("career_id", careers[0]["id"])
+    selected_career = next(
+        (career for career in careers if career["id"] == selected_id),
+        None,
+    )
+
+    if selected_career is None:
+        abort(404)
+
+    gap_names = {
+        " ".join(gap["name"].casefold().split())
+        for gap in selected_career["skill_gaps"]
+    }
+
+    resources = [
+        {"id": resource_id, **resource}
+        for resource_id, resource in LEARNING_RESOURCES.items()
+        if " ".join(resource["skill_name"].casefold().split())
+        in gap_names
+    ]
+
+    activities = LearningActivity.query.filter_by(
+        career_id=selected_id
+    ).order_by(LearningActivity.id.desc()).all()
+
+    return render_template(
+        "learning_plan.html",
+        careers=careers,
+        selected_career=selected_career,
+        activities=activities,
+        statuses=LEARNING_STATUSES,
+        resources=resources,
+    )
+
+
+@app.route("/learning-plan/save", methods=["POST"])
+def save_learning_activity():
+    career_id = request.form.get("career_id", "")
+    resource_id = request.form.get("resource_id", "")
+
+    careers = match_careers(Skill.query.all())
+    career = next(
+        (item for item in careers if item["id"] == career_id),
+        None,
+    )
+    resource = LEARNING_RESOURCES.get(resource_id)
+
+    if career is None or resource is None:
+        abort(404)
+
+    required_names = {
+        " ".join(name.casefold().split())
+        for name in career["required_skills"]
+    }
+    resource_skill = " ".join(
+        resource["skill_name"].casefold().split()
+    )
+
+    if resource_skill not in required_names:
+        abort(400)
+
+    existing = LearningActivity.query.filter_by(
+        career_id=career_id,
+        resource_url=resource["url"],
+    ).first()
+
+    if existing:
+        flash("This resource is already in your learning plan.", "info")
+    else:
+        activity = LearningActivity(
+            career_id=career_id,
+            skill_name=resource["skill_name"],
+            resource_title=resource["title"],
+            resource_url=resource["url"],
+            status="Planned",
+        )
+        db.session.add(activity)
+        db.session.commit()
+        flash("Resource added to your learning plan!", "success")
+
+    return redirect(url_for("learning_plan", career_id=career_id))
+
+@app.route("/learning-plan/<int:activity_id>/status", methods=["POST"])
+def update_learning_status(activity_id):
+    activity = db.get_or_404(LearningActivity, activity_id)
+    new_status = request.form.get("status", "").strip()
+
+    if new_status not in LEARNING_STATUSES:
+        flash("Please select a valid learning status.", "error")
+    else:
+        activity.status = new_status
+        db.session.commit()
+        flash("Learning progress updated!", "success")
+
+    return redirect(
+        url_for("learning_plan", career_id=activity.career_id)
+    )
+
 
 @app.route("/health")
 def health():

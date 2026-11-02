@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Learning Plan | Career One Stop{% endblock %}
+
+{% block content %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+    <p role="status">{{ message }}</p>
+    {% endfor %}
+{% endwith %}
+<h1>My Learning Plan</h1>
+<p>Choose a target career to see which skills you need to develop.</p>
+
+<form method="GET" action="{{ url_for('learning_plan') }}">
+    <label for="career_id">Target career</label>
+    <select id="career_id" name="career_id">
+        {% for career in careers %}
+        <option value="{{ career.id }}"
+                {% if career.id == selected_career.id %}selected{% endif %}>
+            {{ career.title }}
+        </option>
+        {% endfor %}
+    </select>
+    <button type="submit">View learning plan</button>
+</form>
+
+<h2>{{ selected_career.title }}</h2>
+<p>{{ selected_career.match_percentage }}% of listed skill requirements met.</p>
+
+<h3>Skills to develop</h3>
+<ul>
+    {% for gap in selected_career.skill_gaps %}
+    <li>
+        <strong>{{ gap.name }}</strong>:
+        {{ gap.current_level }} →
+        {{ gap.required_level }} required
+    </li>
+    {% else %}
+    <li>You meet all listed skill requirements for this sample career.</li>
+    {% endfor %}
+</ul>
+
+<p><a href="{{ url_for('skills') }}">Update my skills →</a></p>
+<h2>Resources for your skill gaps</h2>
+
+{% for resource in resources %}
+<article class="feature-card">
+    <h3>{{ resource.title }}</h3>
+    <p>Skill: {{ resource.skill_name }}</p>
+    <a href="{{ resource.url }}"
+       target="_blank" rel="noopener noreferrer">
+        Open resource →
+    </a>
+    <form method="POST" action="{{ url_for('save_learning_activity') }}">
+    <input type="hidden" name="career_id"
+           value="{{ selected_career.id }}">
+    <input type="hidden" name="resource_id"
+           value="{{ resource.id }}">
+    <button type="submit">Add to learning plan</button>
+</form>
+</article>
+{% else %}
+<p>
+    No resources from the current catalog match your skill gaps.
+    The catalog currently covers Python, SQL, Git, and Problem Solving.
+</p>
+{% endfor %}
+<h2>Saved learning activities</h2>
+{% for activity in activities %}
+<article class="feature-card">
+    <h3>{{ activity.resource_title }}</h3>
+    <p>Skill: {{ activity.skill_name }}</p>
+    <p>Status: {{ activity.status }}</p>
+    <form method="POST"
+      action="{{ url_for('update_learning_status', activity_id=activity.id) }}">
+    <label for="status-{{ activity.id }}">Progress</label>
+    <select name="status" id="status-{{ activity.id }}">
+        {% for status in statuses %}
+        <option value="{{ status }}"
+                {% if status == activity.status %}selected{% endif %}>
+            {{ status }}
+        </option>
+        {% endfor %}
+    </select>
+    <button type="submit">Update progress</button>
+</form>
+    <a href="{{ activity.resource_url }}"
+       target="_blank" rel="noopener noreferrer">
+        Open learning resource →
+    </a>
+</article>
+{% else %}
+<p>No learning activities saved for this career yet.</p>
+{% endfor %}
+
+<p>Completing a learning activity does not automatically change your skill proficiency.</p>
+{% endblock %}
