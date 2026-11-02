@@ -1,4 +1,3 @@
-
 import os
 from flask import Flask, render_template, request, redirect, url_for, flash
 from datetime import date
@@ -29,7 +28,7 @@ database_url = os.environ.get(
     "DATABASE_URL", "sqlite:///career_one_stop.db"
 )
 
-# Use the installed Psycopg 3 driver for PostgreSQL.
+# Configure PostgreSQL to use the Psycopg 3 driver.
 if database_url.startswith("postgres://"):
     database_url = database_url.replace(
         "postgres://", "postgresql+psycopg://", 1
